@@ -42,7 +42,6 @@ module.exports = [
   'Vinicius de Moraes',
   'Buda',
   'Sarah Westphal',
-  'Paulo Roberto Gaefke',
   'Seneca',
   'Santo Agostinho',
   'Millor Fernandes',
