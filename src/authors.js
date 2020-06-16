@@ -63,6 +63,5 @@ module.exports = [
   'Rui Barbosa',
   'Will Durant',
   'Soren Kierkegaard',
-  'Elbert Hubbard',
-  'Dinamor'
+  'Elbert Hubbard'
 ];
