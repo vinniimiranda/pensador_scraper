@@ -14,7 +14,11 @@ app.get('/authors', (req, res) => {
 });
 app.get('/authors/:author_id', (req, res) => {
   const { author_id } = req.params;
-  res.status(200).json(database.find((item) => (item.author_id = author_id)));
+
+  const author = database.find((author) => author.author_id === author_id);
+  console.log(author);
+
+  res.status(200).json(author);
 });
 
 app.listen(PORT, () => console.log(`Server listening at port: ${PORT}`));
