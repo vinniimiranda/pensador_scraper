@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "scrape": "node dist/scraper",
-    "start": "yarn scrape && node dist/server.js",
+    "start": "node dist/server.js",
     "build": "sucrase ./src -d ./dist --transforms imports"
   },
   "dependencies": {

@@ -2,33 +2,53 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 
 import Author from './schemas/Author';
+import Phrase from './schemas/Phrase';
 
 
 async function ScrapeAndSave () {
-  const authors = await Author.find();
+  const authors = await Author.find({})
   if (authors.length === 0) {
     return await ScrapeAuthorAndSaveOnDatabase()
   }
 
   for await (const author of authors) {
+
     const phrases = await ScrapPensador(author.slug);
-    const updated = await author.updateOne({
-      phrases: {
-        pt: phrases
-      }
-    })
-    console.log(updated);
+
+    for await (const phrase of phrases) {
+      const created = await Phrase.create({
+        author_id: author._id,
+        lang: 'pt-br',
+        value: phrase
+      })
+      console.log(created);
+    }
+
   }
 
   process.exit();
 }
 
 async function ScrapPensador (author_id) {
+  const allPhrases = []
+
   const { data } = await axios.get(`https://www.pensador.com/autor/${author_id}/1`);
   const $ = cheerio.load(data);
-  const phrase = $('.frase');
 
-  return phrase.toArray().map((phrase) => phrase.children[0].data);
+  const total = $('.total').children().last().text() || $('.autorTotal').children().last().text();
+
+  const pagination = parseInt(total / 25 + 1);
+
+  for (let i = 1; i <= pagination; i++) {
+    const { data } = await axios.get(`https://www.pensador.com/autor/${author_id}/${i}`);
+    const $ = cheerio.load(data);
+
+    const phrases = $('.frase');
+    phrases.toArray().forEach((phrase) => allPhrases.push(phrase.children[0].data))
+  }
+
+
+  return allPhrases;
 }
 
 async function ScrapeGoogleImages (author) {
@@ -48,9 +68,7 @@ async function ScrapeAuthorAndSaveOnDatabase () {
   const authors = [
     'Fernando Pessoa',
     'William Shakespeare',
-    'Desconhecido',
     'Clarice Lispector',
-    'Maria Julia Paes de Silva',
     'Friedrich Nietzsche',
     'Augusto Cury',
     'Mario Quintana',
@@ -77,7 +95,6 @@ async function ScrapeAuthorAndSaveOnDatabase () {
     'Geraldo Eustaquio de Souza',
     'Roger Bussy-Rabutin',
     'Joseph Addison',
-    'Toquinho e Mutinho',
     'Myrtes Mathias',
     'Georges Bernanos',
     'Lilian Tonet',
